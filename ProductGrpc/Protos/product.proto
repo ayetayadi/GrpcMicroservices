@@ -1,0 +1,75 @@
+// File is wi=ritten in Protocol Buffers version 3 syntax.
+syntax = "proto3";
+
+//This option specifies the C# namespace for the generated code.
+option csharp_namespace = "ProductGrpc.Protos";
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
+
+service ProductProtoService {
+// CRUD methods
+  // GetProductRequest message as a request, and ProductModel as a response
+  rpc GetProduct (GetProductRequest) returns (ProductModel);
+
+  // 1 server stream and 1 client stream methods which are GetAllProducts and InsertBulkProduct.
+  // GetAllProducts is a server-streaming method. The client sends a single request message of type GetAllProductsRequest, and the server responds with a stream of ProductModel messages (multiple responses). This method is suitable for scenarios where the client needs to retrieve a large number of products or data that can be sent as a stream.
+  rpc GetAllProducts (GetAllProductsRequest) returns (stream ProductModel);
+
+  rpc AddProduct (AddProductRequest) returns (ProductModel);
+  rpc UpdateProduct (UpdateProductRequest) returns (ProductModel);
+  rpc DeleteProduct (DeleteProductRequest) returns (DeleteProductResponse);
+
+  // InsertBulkProduct (Insertion en masse) is a client-streaming method. The client sends a stream of ProductModel messages (multiple requests) to the server, and the server responds with a single response message of type InsertBulkProductResponse. This method is useful when the client wants to send a batch of products or data to be processed in a single operation.
+  rpc InsertBulkProduct (stream ProductModel) returns (InsertBulkProductResponse);
+
+  // Check connectivity between the client and the server. The rpc Test declaration in the product.proto file is a simple unary gRPC method, where the client sends an empty request of type google.protobuf.Empty to the server, and the server responds with an empty response of type google.protobuf.Empty. This type of method is commonly used to perform a simple operation or check connectivity between the client and the server.
+  rpc Test (google.protobuf.Empty) returns (google.protobuf.Empty);
+}
+
+
+// In the context of Protocol Buffers (protobuf),
+//"fields" refer to individual data elements or members of a message.
+//Each field in a protobuf message corresponds to a single piece of data that holds a particular value.
+message GetProductRequest {
+  int32 productId = 1;
+}
+
+message GetAllProductsRequest{
+}
+
+message AddProductRequest {
+  ProductModel product = 1;
+}
+
+message UpdateProductRequest {
+  ProductModel product = 1;
+}
+
+message DeleteProductRequest {
+  int32 productId = 1;
+}
+
+message DeleteProductResponse {
+  bool success = 1;
+}
+
+message InsertBulkProductResponse {
+  bool success = 1;
+  int32 insertCount = 2;
+}
+
+message ProductModel{
+	int32 productId = 1;
+	string name = 2;
+	string description = 3;	
+	float price = 4;
+	ProductStatus status = 5;
+	google.protobuf.Timestamp createdTime = 6;
+}
+
+enum ProductStatus {
+	INSTOCK = 0;
+	LOW = 1;
+	NONE = 2;
+}
